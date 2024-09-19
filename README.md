@@ -2,4 +2,4 @@
 Repozitář pro předmět PMA
 Student: Štěpán Kubica
 Zkousim neco dalsiho pridat GG
-/Zkousim neco pridat na NTB
+Zkousim neco pridat na NTB
