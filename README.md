@@ -6,4 +6,6 @@ Student: Štěpán Kubica
 \lets go novinka
 \zkusime to znova
 
-https://github.com/Bookworm-afk/github-SK-pma-2024/tree/CV1
+
+[CV1](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/CV1)
+
