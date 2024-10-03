@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Jakou herní konzoli si chceš objednat?"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <RadioGroup
+        android:id="@+id/consoleOptions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <RadioButton
+            android:id="@+id/console1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="PlayStation 5"/>
+
+        <RadioButton
+            android:id="@+id/console2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xbox Series X"/>
+
+        <RadioButton
+            android:id="@+id/console3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nintendo Switch"/>
+    </RadioGroup>
+
+    <TextView
+        android:id="@+id/accessoryTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Příslušenství:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/consoleOptions"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <CheckBox
+        android:id="@+id/accessory1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Extra kontroler"
+        app:layout_constraintTop_toBottomOf="@id/accessoryTitle"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <CheckBox
+        android:id="@+id/accessory2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Headset"
+        app:layout_constraintTop_toBottomOf="@id/accessory1"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <CheckBox
+        android:id="@+id/accessory3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mikrofon"
+        app:layout_constraintTop_toBottomOf="@id/accessory2"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Button
+        android:id="@+id/orderButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="OBJEDNAT KONZOLI"
+        android:background="@color/black"
+        android:textColor="@android:color/white"
+        app:layout_constraintTop_toBottomOf="@id/accessory3"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <TextView
+        android:id="@+id/orderSummary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Souhrn objednávky:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/orderButton"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <ImageView
+        android:id="@+id/consoleImageView"
+        android:layout_width="0dp"
+        android:layout_height="200dp"
+        android:contentDescription="Console Image"
+        app:layout_constraintTop_toBottomOf="@id/orderSummary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+</androidx.constraintlayout.widget.ConstraintLayout>
