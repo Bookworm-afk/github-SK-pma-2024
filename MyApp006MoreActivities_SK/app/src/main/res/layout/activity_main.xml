@@ -1,30 +1,44 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <!-- TopAppBar -->
-    <androidx.appcompat.widget.Toolbar
+    <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:theme="?attr/actionBarTheme" />
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
 
-    <EditText
-        android:id="@+id/editTextTask"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Zadejte úkol"
-        android:minHeight="48dp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginTop="?attr/actionBarSize">
 
-    <Button
-        android:id="@+id/buttonSend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Odeslat úkol" />
-</LinearLayout>
+        <EditText
+            android:id="@+id/etTaskName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Název úkolu"
+            android:minHeight="48dp" />
+
+        <EditText
+            android:id="@+id/etTaskDeadline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Termín"
+            android:minHeight="48dp" />
+
+        <Button
+            android:id="@+id/btnNext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Další" />
+
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

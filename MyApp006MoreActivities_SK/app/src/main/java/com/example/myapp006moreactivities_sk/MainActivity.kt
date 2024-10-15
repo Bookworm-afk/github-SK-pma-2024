@@ -6,27 +6,28 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapp006moreactivities_sk.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Použití View Binding
+        // Použití ViewBindingu
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Nastavení TopBaru
+        // Top AppBar
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "To-Do List"
+        supportActionBar?.title = "Zadat úkol"
 
-        // Kliknutí na tlačítko pro odeslání úkolu do druhé aktivity
-        binding.buttonSend.setOnClickListener {
-            val task = binding.editTextTask.text.toString()
-            if (task.isNotEmpty()) {
-                val intent = Intent(this, SecondActivity::class.java)
-                intent.putExtra("task", task)
-                startActivity(intent)
-            }
+        // Akce po kliknutí na tlačítko "Další"
+        binding.btnNext.setOnClickListener {
+            val taskName = binding.etTaskName.text.toString()
+            val taskDeadline = binding.etTaskDeadline.text.toString()
+
+            // Přechod do druhé aktivity s přenesením dat
+            val intent = Intent(this, SecondActivity::class.java)
+            intent.putExtra("task_name", taskName)
+            intent.putExtra("task_deadline", taskDeadline)
+            startActivity(intent)
         }
     }
 }

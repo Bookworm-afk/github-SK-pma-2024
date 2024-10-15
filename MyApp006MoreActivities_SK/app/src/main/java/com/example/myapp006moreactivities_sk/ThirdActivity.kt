@@ -5,21 +5,24 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapp006moreactivities_sk.databinding.ThirdactivityBinding
 
 class ThirdActivity : AppCompatActivity() {
-
     private lateinit var binding: ThirdactivityBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // Použití View Binding
+        // Použití ViewBindingu
         binding = ThirdactivityBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Nastavení TopBaru
+        // Top AppBar
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "Potvrzení úkolu"
+        supportActionBar?.title = "Přehled úkolu"
 
-        // Získání souhrnu úkolu z SecondActivity
-        val taskSummary = intent.getStringExtra("taskSummary")
-        binding.textViewSummary.text = taskSummary
+        // Získání dat z druhé aktivity
+        val taskName = intent.getStringExtra("task_name")
+        val taskDeadline = intent.getStringExtra("task_deadline")
+        val taskCategory = intent.getStringExtra("task_category")
+
+        // Nastavení dat do TextView
+        binding.tvTaskSummary.text = "Úkol: $taskName\nTermín: $taskDeadline\nKategorie: $taskCategory"
     }
 }
