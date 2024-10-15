@@ -9,4 +9,6 @@ Odkazy pro vypracované cvičení
 
 [CV2](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/CV2)
 
-[CV3]()
+[CV3 z hodiny]()
+
+[CV3 na doma]()
