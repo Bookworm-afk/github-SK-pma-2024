@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <!-- Textové pole pro zadávání úkolu -->
+    <EditText
+        android:id="@+id/todo_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Zadejte nový úkol"
+        android:inputType="text"
+        android:minHeight="48dp" />
+
+    <!-- Tlačítka pro přidání a smazání úkolu -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:paddingTop="16dp">
+
+        <Button
+            android:id="@+id/add_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Přidat úkol" />
+
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Smazat vybrané"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#FF0000"
+            android:layout_marginStart="8dp" />
+    </LinearLayout>
+
+    <!-- Seznam úkolů -->
+    <LinearLayout
+        android:id="@+id/todo_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+
+    <!-- Tlačítko pro zobrazení Snackbaru -->
+
+    <!-- Tlačítko pro zobrazení Toastu -->
+
+    <Button
+        android:id="@+id/snackbar_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Show Snackbar" />
+
+    <Button
+        android:id="@+id/toast_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Show Toast" />
+
+</LinearLayout>
