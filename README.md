@@ -15,7 +15,7 @@ Odkazy pro vypracované cvičení
 
 [CV4_toas_snackbar]()
 
-[CV5_fragments]()
+[CV5_fragments](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/Fragments)
 
 [CV3_SharedPreferences]()
 
