@@ -17,7 +17,7 @@ Odkazy pro vypracované cvičení
 
 [CV5_fragments](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/Fragments/App_fragments/app)
 
-[CV5_SharedPreferences](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/SharedPreferences/My_app_sharedpreferences/app)
+[CV6_SharedPreferences](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/SharedPreferences/My_app_sharedpreferences/app)
 
-[CV6_datastore]()
+[CV7_datastore](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/Datastore/My_App_datastore)
 
