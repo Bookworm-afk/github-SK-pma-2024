@@ -11,4 +11,12 @@ Odkazy pro vypracované cvičení
 
 [CV3 z hodiny_jetpack_compose](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/CV3_hodina)
 
-[CV3 na doma_edit_text_to_activity]()
+[CV3 na doma_edit_text_to_activity](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/CV3_na_doma)
+
+[CV4_toast_snack](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/Toast_snackbar)
+
+[CV5_fragments]()
+
+[CV3_SharedPreferences]()
+
+[CV3_datastore]()
