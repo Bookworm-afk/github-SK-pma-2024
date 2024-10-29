@@ -13,7 +13,7 @@ Odkazy pro vypracované cvičení
 
 [CV3 na doma_edit_text_to_activity](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/CV3_na_doma)
 
-[CV4_toas_snackbar]()
+[CV4_toas_snackbar](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/Toast_snackbar)
 
 [CV5_fragments](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/Fragments)
 
