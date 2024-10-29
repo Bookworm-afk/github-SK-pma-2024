@@ -17,6 +17,6 @@ Odkazy pro vypracované cvičení
 
 [CV5_fragments]()
 
-[CV3_SharedPreferences]()
+[CV5_SharedPreferences]()
 
-[CV3_datastore]()
+[CV6_datastore]()
