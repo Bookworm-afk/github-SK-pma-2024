@@ -21,3 +21,8 @@ Odkazy pro vypracované cvičení
 
 [CV7_datastore](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/Datastore/My_App_datastore)
 
+[CV8_obrázek_z_galerie_do_appf](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/MyApp_galerie_fotka)
+
+[CV9_opravená_app_math](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/MyApp_math/jednoducha_math/app)
+
+[CV10_database](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/MyAppDB/MyAppDB)
