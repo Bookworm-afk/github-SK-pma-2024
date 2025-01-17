@@ -33,23 +33,36 @@ data class DogWalkingData(
 )
 
 class DogWalkingActivity : ComponentActivity() {
+    private var walkingDataListUpdater: ((List<DogWalkingData>) -> Unit)? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             GinnappTheme {
-                DogWalkingScreen()
+                DogWalkingScreen { updater ->
+                    walkingDataListUpdater = updater
+                }
             }
         }
+    }
+
+    fun updateWalkingDataList(data: List<DogWalkingData>) {
+        walkingDataListUpdater?.invoke(data)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DogWalkingScreen() {
+fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> Unit) {
     val context = LocalContext.current
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
-    val calendarDialogState = rememberUseCaseState() // Properly initialize UseCaseState
+    val calendarDialogState = rememberUseCaseState()
     var walkingDataList by remember { mutableStateOf<List<DogWalkingData>>(emptyList()) }
+
+    // Provide a callback for updating the list
+    onUpdateListCallback { updatedList ->
+        walkingDataList = updatedList
+    }
 
     // Fetch data from Firestore when the screen is loaded
     LaunchedEffect(Unit) {
@@ -76,7 +89,7 @@ fun DogWalkingScreen() {
                 )
 
                 Button(
-                    onClick = { calendarDialogState.show() }, // Show calendar dialog
+                    onClick = { calendarDialogState.show() },
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(text = "Pick a Date")
@@ -105,7 +118,6 @@ fun DogWalkingScreen() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Display walking data in a table format below the buttons
                 if (walkingDataList.isNotEmpty()) {
                     Text(
                         text = "My Walking Data",
@@ -125,7 +137,6 @@ fun DogWalkingScreen() {
                     Text(text = "No walking data available.", style = MaterialTheme.typography.bodyLarge)
                 }
 
-                // Calendar Dialog for date selection
                 CalendarDialog(
                     state = calendarDialogState,
                     config = CalendarConfig(yearSelection = true),
@@ -138,6 +149,7 @@ fun DogWalkingScreen() {
         }
     )
 }
+
 @Composable
 fun WalkingDataRow(data: DogWalkingData) {
     Card(
@@ -199,6 +211,16 @@ fun saveWalkingDataToFirestore(selectedDate: LocalDate, context: android.content
             .add(walkingData)
             .addOnSuccessListener {
                 Toast.makeText(context, "Walking data saved successfully!", Toast.LENGTH_SHORT).show()
+
+                // Refresh the table by fetching updated data
+                fetchWalkingDataFromFirestore { updatedData ->
+                    (context as? ComponentActivity)?.let { activity ->
+                        activity.runOnUiThread {
+                            // Update the walkingDataList state in your Composable
+                            (activity as DogWalkingActivity).updateWalkingDataList(updatedData)
+                        }
+                    }
+                }
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Failed to save data: ${e.message}", Toast.LENGTH_SHORT).show()
