@@ -1,5 +1,6 @@
 package com.example.ginnapp
 
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -80,6 +81,9 @@ class MainActivity : ComponentActivity() {
                     // Login success
                     Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show()
                     println("User logged in: ${auth.currentUser?.email}")
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 } else {
                     // Login failed
                     Toast.makeText(this, "Authentication failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
@@ -100,6 +104,9 @@ class MainActivity : ComponentActivity() {
                     // Registration success
                     Toast.makeText(this, "Registration successful!", Toast.LENGTH_SHORT).show()
                     println("User registered: ${auth.currentUser?.email}")
+                    val intent = Intent(this, HomeActivity::class.java)
+                    startActivity(intent)
+                    finish()
                 } else {
                     // Registration failed
                     Toast.makeText(this, "Registration failed: ${task.exception?.message}", Toast.LENGTH_SHORT).show()
