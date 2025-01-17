@@ -28,3 +28,5 @@ Odkazy pro vypracované cvičení
 [CV10_database](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/MyAppDB/MyAppDB)
 
 [VanociApp](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/VanocniAPP/VanocniAPP/app/src/main)
+
+[Semestrálka ginnapp](https://github.com/Bookworm-afk/github-SK-pma-2024/tree/ginnapp/ginnapp/app)
