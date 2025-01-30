@@ -1,10 +1,8 @@
 package com.example.ginnapp
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,36 +10,41 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.ginnapp.ui.theme.GinnappTheme
 import com.google.firebase.firestore.FirebaseFirestore
 
-data class UserWalkStats(
-    val email: String,
-    val walkCount: Int
+data class DogWalkingDetail(
+    val date: String = "",
+    val length: String = "",
+    val pee: Boolean = false,
+    val poo: Boolean = false,
+    val done: Boolean = false
 )
 
-class StatisticsActivity : ComponentActivity() {
+class UserDetailsActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // Get the email passed from StatisticsActivity
+        val email = intent.getStringExtra("email") ?: ""
+
         setContent {
             GinnappTheme {
-                StatisticsScreen()
+                UserDetailsScreen(email)
             }
         }
     }
 }
 
 @Composable
-fun StatisticsScreen() {
-    var userWalkStats by remember { mutableStateOf<List<UserWalkStats>>(emptyList()) }
-    val context = LocalContext.current
+fun UserDetailsScreen(email: String) {
+    var walkingDetails by remember { mutableStateOf<List<DogWalkingDetail>>(emptyList()) }
 
     // Fetch data from Firestore when the screen is loaded
-    LaunchedEffect(Unit) {
-        fetchUserWalkStatsFromFirestore { stats ->
-            userWalkStats = stats
+    LaunchedEffect(email) {
+        fetchWalkingDetailsForUser(email) { details ->
+            walkingDetails = details
         }
     }
 
@@ -57,29 +60,23 @@ fun StatisticsScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Dog Walking Statistics",
+                    text = "Walking Details for $email",
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
 
-                if (userWalkStats.isNotEmpty()) {
+                if (walkingDetails.isNotEmpty()) {
                     LazyColumn(
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(vertical = 8.dp)
                     ) {
-                        items(userWalkStats) { stat ->
-                            UserWalkStatRow(stat) {
-                                // Navigate to UserDetailsActivity with the selected user's email
-                                val intent = Intent(context, UserDetailsActivity::class.java).apply {
-                                    putExtra("email", stat.email)
-                                }
-                                context.startActivity(intent)
-                            }
+                        items(walkingDetails) { detail ->
+                            WalkingDetailRow(detail)
                         }
                     }
                 } else {
                     Text(
-                        text = "No walking records available.",
+                        text = "No walking details available.",
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.padding(top = 16.dp)
                     )
@@ -90,41 +87,34 @@ fun StatisticsScreen() {
 }
 
 @Composable
-fun UserWalkStatRow(stat: UserWalkStats, onClick: () -> Unit) {
+fun WalkingDetailRow(detail: DogWalkingDetail) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable { onClick() },
+        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = "Email: ${stat.email}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Number of Walks: ${stat.walkCount}", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Date: ${detail.date}", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Length: ${detail.length}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Pee: ${if (detail.pee) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Poo: ${if (detail.poo) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Done: ${if (detail.done) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
 
-fun fetchUserWalkStatsFromFirestore(onResult: (List<UserWalkStats>) -> Unit) {
+fun fetchWalkingDetailsForUser(email: String, onResult: (List<DogWalkingDetail>) -> Unit) {
     val db = FirebaseFirestore.getInstance()
 
     db.collection("dogWalking")
+        .whereEqualTo("email", email)
         .get()
         .addOnSuccessListener { querySnapshot ->
-            val walkCounts = mutableMapOf<String, Int>()
+            val detailsList =
+                querySnapshot.documents.mapNotNull { document ->
+                    document.toObject(DogWalkingDetail::class.java)?.copy(date=document.getString("date") ?: "")
+                }
 
-            // Count walks per email
-            for (document in querySnapshot.documents) {
-                val email = document.getString("email") ?: continue
-                walkCounts[email] = walkCounts.getOrDefault(email, 0) + 1
-            }
-
-            // Convert map to list of UserWalkStats objects
-            val statsList = walkCounts.map { (email, count) ->
-                UserWalkStats(email, count)
-            }
-
-            onResult(statsList)
+            onResult(detailsList)
         }
         .addOnFailureListener { e ->
             e.printStackTrace()
