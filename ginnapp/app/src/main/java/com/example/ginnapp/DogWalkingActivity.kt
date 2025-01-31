@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.ginnapp.ui.theme.GinnappTheme
@@ -50,6 +51,8 @@ class DogWalkingActivity : ComponentActivity() {
         walkingDataListUpdater?.invoke(data)
     }
 }
+
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> Unit) {
@@ -73,6 +76,14 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
         fetchWalkingDataFromFirestore { data ->
             walkingDataList = data
         }
+    }
+
+    // Split data into future and past walks
+    val pastWalks = walkingDataList.filter {
+        LocalDate.parse(it.date).isBefore(LocalDate.now()) || LocalDate.parse(it.date).isEqual(LocalDate.now())
+    }
+    val futureWalks = walkingDataList.filter {
+        LocalDate.parse(it.date).isAfter(LocalDate.now())
     }
 
     Scaffold(
@@ -104,8 +115,7 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
                 selectedDate?.let {
                     Text(text = "Selected Date: $it", style = MaterialTheme.typography.bodyLarge)
 
-                    // Show input fields only if the selected date is in the past
-                    if (it.isBefore(LocalDate.now())) {
+                    if (!it.isAfter(LocalDate.now())) {
                         Spacer(modifier = Modifier.height(16.dp))
 
                         OutlinedTextField(
@@ -152,31 +162,59 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // LazyColumn for displaying walking data
-                if (walkingDataList.isNotEmpty()) {
+                // Display Future Walks
+                if (futureWalks.isNotEmpty()) {
                     Text(
-                        text = "My Walking Data",
+                        text = "Future Walks",
                         style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom=8.dp)
                     )
-
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(vertical = 8.dp)
+                        modifier=Modifier.fillMaxWidth(),
+                        contentPadding=PaddingValues(vertical=8.dp)
                     ) {
-                        items(walkingDataList) { data ->
+                        items(futureWalks) { data ->
+                            FutureWalkRow(data)
+                        }
+                    }
+                } else {
+                    Text(
+                        text="No future walks scheduled.",
+                        style=MaterialTheme.typography.bodyLarge,
+                        modifier=Modifier.padding(top=8.dp)
+                    )
+                }
+
+                Spacer(modifier=Modifier.height(16.dp))
+
+                // Display Past Walks
+                if (pastWalks.isNotEmpty()) {
+                    Text(
+                        text="Past Walks",
+                        style=MaterialTheme.typography.headlineSmall,
+                        modifier=Modifier.padding(bottom=8.dp)
+                    )
+                    LazyColumn(
+                        modifier=Modifier.fillMaxWidth(),
+                        contentPadding=PaddingValues(vertical=8.dp)
+                    ) {
+                        items(pastWalks) { data ->
                             WalkingDataRow(data)
                         }
                     }
                 } else {
-                    Text(text = "No walking data available.", style = MaterialTheme.typography.bodyLarge)
+                    Text(
+                        text="No past walks available.",
+                        style=MaterialTheme.typography.bodyLarge,
+                        modifier=Modifier.padding(top=8.dp)
+                    )
                 }
 
                 CalendarDialog(
-                    state = calendarDialogState,
-                    config = CalendarConfig(yearSelection = true),
-                    selection = CalendarSelection.Date { date ->
-                        selectedDate = date
+                    state=calendarDialogState,
+                    config=CalendarConfig(yearSelection=true),
+                    selection=CalendarSelection.Date { date ->
+                        selectedDate=date
                         Toast.makeText(context, "Selected Date: $date", Toast.LENGTH_SHORT).show()
                     }
                 )
@@ -184,6 +222,25 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
         }
     )
 }
+
+@Composable
+fun FutureWalkRow(data: DogWalkingData) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    ) {
+        Column(modifier = Modifier.padding(8.dp)) {
+            Text(
+                text = "Date: ${data.date}",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.Black // Adjust color as needed for your theme.
+            )
+        }
+    }
+}
+
 
 @Composable
 fun WalkingDataRow(data: DogWalkingData) {
@@ -239,16 +296,16 @@ fun saveWalkingDataToFirestore(
     if (userEmail != null) {
         val db = FirebaseFirestore.getInstance()
 
-        // Determine if the walk is in the past or future
-        val isPastWalk = selectedDate.isBefore(LocalDate.now())
+        // Determine if the walk is in the past or today
+        val isPastWalkOrToday = !selectedDate.isAfter(LocalDate.now())
 
         val walkingData = hashMapOf(
             "email" to userEmail,
             "date" to selectedDate.toString(),
-            "done" to isPastWalk, // Mark as done if it's a past walk
-            "length" to if (isPastWalk) length else "",
-            "pee" to if (isPastWalk) pee else false,
-            "poo" to if (isPastWalk) poo else false
+            "done" to isPastWalkOrToday, // Mark as done if it's today or in the past
+            "length" to if (isPastWalkOrToday) length else "",
+            "pee" to if (isPastWalkOrToday) pee else false,
+            "poo" to if (isPastWalkOrToday) poo else false
         )
 
         db.collection("dogWalking")
