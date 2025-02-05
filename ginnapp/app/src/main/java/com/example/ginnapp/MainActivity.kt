@@ -18,7 +18,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -30,7 +29,7 @@ class MainActivity : ComponentActivity() {
     // Initialize FirebaseAuth instance
     private lateinit var auth: FirebaseAuth
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) { //Sets up the main activity, initializes FirebaseAuth, and manages navigation between login and registration screens
         super.onCreate(savedInstanceState)
 
         // Enable edge-to-edge display
@@ -73,7 +72,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun loginWithFirebase(email: String, password: String) {
+    private fun loginWithFirebase(email: String, password: String) { //Handles user login using Firebase Authentication
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
             return
@@ -96,7 +95,7 @@ class MainActivity : ComponentActivity() {
             }
     }
 
-    private fun registerWithFirebase(email: String, password: String) {
+    private fun registerWithFirebase(email: String, password: String) { //Handles user registration using Firebase Authentication
         if (email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Please fill out all fields", Toast.LENGTH_SHORT).show()
             return
@@ -122,7 +121,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LoginScreen(
+fun LoginScreen( //Displays the login form and navigates to the registration screen on request.
     modifier: Modifier = Modifier,
     onLoginClick: (String, String) -> Unit,
     onNavigateToRegister: () -> Unit
@@ -205,7 +204,7 @@ fun LoginScreen(
 }
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RegisterScreen(
+fun RegisterScreen( //Displays the registration form and navigates back to the login screen.
     modifier: Modifier = Modifier,
     onRegisterClick: (String, String) -> Unit,
     onNavigateBack: () -> Unit

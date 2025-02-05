@@ -27,7 +27,7 @@ data class BarChartData(
 )
 
 class BarChartActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) { //Sets up the activity and displays the BarChartScreen
         super.onCreate(savedInstanceState)
         setContent {
             GinnappTheme {
@@ -38,7 +38,7 @@ class BarChartActivity : ComponentActivity() {
 }
 
 @Composable
-fun BarChartScreen() {
+fun BarChartScreen() { //Shows a horizontal bar chart with user walking data
     var chartData by remember { mutableStateOf<List<BarChartData>>(emptyList()) }
 
     // Fetch data from Firestore when the screen is loaded
@@ -77,7 +77,7 @@ fun BarChartScreen() {
 }
 
 @Composable
-fun HorizontalBarChart(
+fun HorizontalBarChart( //Renders a horizontal bar chart based on provided data
     data: List<BarChartData>,
     modifier: Modifier = Modifier,
     maxBarWidth: Dp = 300.dp // Maximum width for the longest bar
@@ -149,7 +149,7 @@ fun HorizontalBarChart(
 }
 
 
-fun fetchBarChartData(onResult: (List<BarChartData>) -> Unit) {
+fun fetchBarChartData(onResult: (List<BarChartData>) -> Unit) { //Retrieves walking data for the bar chart from Firestore
     val db = FirebaseFirestore.getInstance()
 
     db.collection("dogWalking")

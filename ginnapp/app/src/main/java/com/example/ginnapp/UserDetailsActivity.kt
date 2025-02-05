@@ -32,7 +32,7 @@ data class DogWalkingDetail(
 )
 
 class UserDetailsActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) { // Loads user email and displays the UserDetailsScreen
         super.onCreate(savedInstanceState)
 
         // Get the email passed from StatisticsActivity
@@ -47,7 +47,7 @@ class UserDetailsActivity : ComponentActivity() {
 }
 
 @Composable
-fun UserDetailsScreen(email: String) {
+fun UserDetailsScreen(email: String) { //Shows past and future walks of a specific user
     var pastWalks by remember { mutableStateOf<List<DogWalkingDetail>>(emptyList()) }
     var futureWalks by remember { mutableStateOf<List<DogWalkingDetail>>(emptyList()) }
 
@@ -143,8 +143,9 @@ fun UserDetailsScreen(email: String) {
     )
 }
 
+
 @Composable
-fun WalkingDetailRow(detail: DogWalkingDetail) {
+fun WalkingDetailRow(detail: DogWalkingDetail) { //Displays details of an individual walk (date, length, etc.)
     Card(
         modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
@@ -159,7 +160,7 @@ fun WalkingDetailRow(detail: DogWalkingDetail) {
     }
 }
 
-fun fetchWalkingDetailsForUser(email: String, onResult: (List<DogWalkingDetail>, List<DogWalkingDetail>) -> Unit) {
+fun fetchWalkingDetailsForUser(email: String, onResult: (List<DogWalkingDetail>, List<DogWalkingDetail>) -> Unit) { //Fetches past and future walk details for a user from Firestore
     val db = FirebaseFirestore.getInstance()
     val currentDate = LocalDate.now()
 

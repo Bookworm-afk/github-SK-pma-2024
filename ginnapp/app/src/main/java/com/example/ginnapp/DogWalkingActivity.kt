@@ -35,7 +35,7 @@ data class DogWalkingData(
 class DogWalkingActivity : ComponentActivity() {
     private var walkingDataListUpdater: ((List<DogWalkingData>) -> Unit)? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) { // Initializes the activity and sets up the dog walking screen
         super.onCreate(savedInstanceState)
         setContent {
             GinnappTheme {
@@ -49,7 +49,7 @@ class DogWalkingActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> Unit) {
+fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> Unit) { //Displays a form for scheduling walks and lists past and future walks.
     val context = LocalContext.current
     var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
     val calendarDialogState = rememberUseCaseState()
@@ -216,7 +216,7 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
 }
 
 @Composable
-fun FutureWalkRow(data: DogWalkingData) {
+fun FutureWalkRow(data: DogWalkingData) {//Displays details of a scheduled future walk
     Card(
         modifier=Modifier.fillMaxWidth().padding(vertical=4.dp),
         elevation=CardDefaults.cardElevation(defaultElevation=4.dp)
@@ -229,7 +229,7 @@ fun FutureWalkRow(data: DogWalkingData) {
 }
 
 @Composable
-fun WalkingDataRow(data: DogWalkingData) {
+fun WalkingDataRow(data: DogWalkingData) {//Displays details of a completed or past walk
     Card(
         modifier=Modifier.fillMaxWidth().padding(vertical=4.dp),
         elevation=CardDefaults.cardElevation(defaultElevation=4.dp)
@@ -245,7 +245,7 @@ fun WalkingDataRow(data: DogWalkingData) {
     }
 }
 
-fun fetchWalkingDataFromFirestore(onResult: (List<DogWalkingData>) -> Unit) {
+fun fetchWalkingDataFromFirestore(onResult: (List<DogWalkingData>) -> Unit) { //Retrieves dog walking data from Firestore for the current user
     val auth = FirebaseAuth.getInstance()
     val userEmail = auth.currentUser?.email
 
@@ -268,7 +268,7 @@ fun fetchWalkingDataFromFirestore(onResult: (List<DogWalkingData>) -> Unit) {
     }
 }
 
-fun saveWalkingDataToFirestore(
+fun saveWalkingDataToFirestore( //Saves scheduled or completed walk data to Firestore
     selectedDate: LocalDate,
     context: android.content.Context,
     length: String,

@@ -31,7 +31,7 @@ data class UserWalkStats(
 )
 
 class StatisticsActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {   //Sets up the activity and displays the StatisticsScreen
         super.onCreate(savedInstanceState)
         setContent {
             GinnappTheme {
@@ -41,7 +41,7 @@ class StatisticsActivity : ComponentActivity() {
     }
 }
 @Composable
-fun StatisticsScreen() {
+fun StatisticsScreen() { //Shows user walking stats and average walk duration, with navigation options
     var userWalkStats by remember { mutableStateOf<List<UserWalkStats>>(emptyList()) }
     var averageDuration by remember { mutableStateOf(0.0) }
     val context = LocalContext.current
@@ -144,7 +144,7 @@ fun StatisticsScreen() {
 
 
 @Composable
-fun UserWalkStatRow(stat: UserWalkStats, onClick: () -> Unit) {
+fun UserWalkStatRow(stat: UserWalkStats, onClick: () -> Unit) { //Displays a user's email and walk count, with a clickable row
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -158,7 +158,7 @@ fun UserWalkStatRow(stat: UserWalkStats, onClick: () -> Unit) {
         }
     }
 }
-fun fetchUserWalkStatsFromFirestore(onResult: (List<UserWalkStats>) -> Unit) {
+fun fetchUserWalkStatsFromFirestore(onResult: (List<UserWalkStats>) -> Unit) { // Retrieves user walk counts from Firestore
     val db = FirebaseFirestore.getInstance()
 
     db.collection("dogWalking")
@@ -199,7 +199,7 @@ fun fetchUserWalkStatsFromFirestore(onResult: (List<UserWalkStats>) -> Unit) {
 }
 
 
-fun fetchAverageWalkDurationFromFirestore(onResult: (Double) -> Unit) {
+fun fetchAverageWalkDurationFromFirestore(onResult: (Double) -> Unit) { //Calculates the average walk duration from Firestore data
     val db = FirebaseFirestore.getInstance()
 
     db.collection("dogWalking")
