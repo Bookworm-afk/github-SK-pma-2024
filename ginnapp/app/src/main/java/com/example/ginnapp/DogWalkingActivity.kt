@@ -22,11 +22,10 @@ import com.maxkeppeler.sheets.calendar.CalendarDialog
 import com.maxkeppeler.sheets.calendar.models.CalendarConfig
 import com.maxkeppeler.sheets.calendar.models.CalendarSelection
 import java.time.LocalDate
-import com.google.firebase.Timestamp
 
 data class DogWalkingData(
     val email: String = "",
-    val date: String = Timestamp.now().toString(),
+    val date: String = "",
     val length: String = "",
     val pee: Boolean = false,
     val poo: Boolean = false,
@@ -46,9 +45,7 @@ class DogWalkingActivity : ComponentActivity() {
             }
         }
     }
-
 }
-
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -58,27 +55,21 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
     val calendarDialogState = rememberUseCaseState()
     var walkingDataList by remember { mutableStateOf<List<DogWalkingData>>(emptyList()) }
 
-    // State variables for length input
+    // Stavové proměnné pro vstupy
     var length by remember { mutableStateOf("") }
+    var pee by remember { mutableStateOf(false) }
+    var poo by remember { mutableStateOf(false) }
 
-    // Provide a callback for updating the list
+    // Callback pro aktualizaci seznamu
     onUpdateListCallback { updatedList ->
         walkingDataList = updatedList
     }
 
-    // Fetch data from Firestore when the screen is loaded
+    // Načtení dat z Firestore při spuštění obrazovky
     LaunchedEffect(Unit) {
         fetchWalkingDataFromFirestore { data ->
             walkingDataList = data
         }
-    }
-
-    // Split data into future and past walks
-    val pastWalks = walkingDataList.filter {
-        LocalDate.parse(it.date).isBefore(LocalDate.now()) || LocalDate.parse(it.date).isEqual(LocalDate.now())
-    }
-    val futureWalks = walkingDataList.filter {
-        LocalDate.parse(it.date).isAfter(LocalDate.now())
     }
 
     Scaffold(
@@ -110,13 +101,29 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
                 selectedDate?.let {
                     Text(text = "Selected Date: $it", style = MaterialTheme.typography.bodyLarge)
 
-                    if (it.isAfter(LocalDate.now())) { // Future walks
+                    if (it.isBefore(LocalDate.now()) || it.isEqual(LocalDate.now())) {
                         Spacer(modifier = Modifier.height(16.dp))
-
                         OutlinedTextField(
                             value = length,
                             onValueChange = { length = it },
-                            label = { Text("Approximate Time (e.g., 13h or 30 mins)") },
+                            label = { Text("Length (e.g., 30 mins)") },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(checked = pee, onCheckedChange = { pee = it })
+                            Text(text = "Pee")
+                        }
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Checkbox(checked = poo, onCheckedChange = { poo = it })
+                            Text(text = "Poo")
+                        }
+                    } else if (it.isAfter(LocalDate.now())) {
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(
+                            value = length,
+                            onValueChange = { length = it },
+                            label = { Text("Approximate Time (e.g., 13:00 h)") },
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -129,9 +136,9 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
                         if (selectedDate == null) {
                             Toast.makeText(context, "Please select a date first.", Toast.LENGTH_SHORT).show()
                         } else if (length.isEmpty()) {
-                            Toast.makeText(context, "Please enter the approximate time or length.", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(context, "Please enter the length or time.", Toast.LENGTH_SHORT).show()
                         } else {
-                            saveWalkingDataToFirestore(selectedDate!!, context, length, false, false)
+                            saveWalkingDataToFirestore(selectedDate!!, context, length, pee, poo)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -139,21 +146,24 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
                     Text(text = "Save Walk")
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier=Modifier.height(16.dp))
 
-                // Display Future Walks
-                if (futureWalks.isNotEmpty()) {
+                // Future Walks Section with Scrollable Box
+                if (walkingDataList.any { LocalDate.parse(it.date).isAfter(LocalDate.now()) }) {
                     Text(
-                        text = "Future Walks",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom=8.dp)
+                        text="Future Walks",
+                        style=MaterialTheme.typography.headlineSmall,
+                        modifier=Modifier.padding(bottom=8.dp)
                     )
-                    LazyColumn(
-                        modifier=Modifier.fillMaxWidth(),
-                        contentPadding=PaddingValues(vertical=8.dp)
+                    Box(
+                        modifier=Modifier
+                            .fillMaxWidth()
+                            .height(200.dp) // Limit height for scrollability.
                     ) {
-                        items(futureWalks) { data ->
-                            FutureWalkRow(data)
+                        LazyColumn(contentPadding=PaddingValues(vertical=8.dp)) {
+                            items(walkingDataList.filter { LocalDate.parse(it.date).isAfter(LocalDate.now()) }) { data ->
+                                FutureWalkRow(data)
+                            }
                         }
                     }
                 } else {
@@ -166,19 +176,22 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
 
                 Spacer(modifier=Modifier.height(16.dp))
 
-                // Display Past Walks
-                if (pastWalks.isNotEmpty()) {
+                // Past Walks Section with Scrollable Box
+                if (walkingDataList.any { !LocalDate.parse(it.date).isAfter(LocalDate.now()) }) {
                     Text(
                         text="Past Walks",
                         style=MaterialTheme.typography.headlineSmall,
                         modifier=Modifier.padding(bottom=8.dp)
                     )
-                    LazyColumn(
-                        modifier=Modifier.fillMaxWidth(),
-                        contentPadding=PaddingValues(vertical=8.dp)
+                    Box(
+                        modifier=Modifier
+                            .fillMaxWidth()
+                            .height(200.dp) // Limit height for scrollability.
                     ) {
-                        items(pastWalks) { data ->
-                            WalkingDataRow(data)
+                        LazyColumn(contentPadding=PaddingValues(vertical=8.dp)) {
+                            items(walkingDataList.filter { !LocalDate.parse(it.date).isAfter(LocalDate.now()) }) { data ->
+                                WalkingDataRow(data)
+                            }
                         }
                     }
                 } else {
@@ -205,43 +218,29 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
 @Composable
 fun FutureWalkRow(data: DogWalkingData) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier=Modifier.fillMaxWidth().padding(vertical=4.dp),
+        elevation=CardDefaults.cardElevation(defaultElevation=4.dp)
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(
-                text = "Date: ${data.date}",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Black // Adjust color as needed for your theme.
-            )
-            Text(
-                text = "Approximate Time/Length: ${data.length}",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Black
-            )
+        Column(modifier=Modifier.padding(8.dp)) {
+            Text(text="Date: ${data.date}", style=MaterialTheme.typography.bodyLarge)
+            Text(text="Approximate Time/Length: ${data.length}", style=MaterialTheme.typography.bodyMedium)
         }
     }
 }
 
-
-
 @Composable
 fun WalkingDataRow(data: DogWalkingData) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        modifier=Modifier.fillMaxWidth().padding(vertical=4.dp),
+        elevation=CardDefaults.cardElevation(defaultElevation=4.dp)
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = "Email: ${data.email}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Date: ${data.date}", style = MaterialTheme.typography.bodyLarge)
-            Text(text = "Length: ${data.length}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Pee: ${if (data.pee) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Poo: ${if (data.poo) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Done: ${if (data.done) "Yes" else "No"}", style = MaterialTheme.typography.bodyMedium)
+        Column(modifier=Modifier.padding(8.dp)) {
+            Text(text="Email: ${data.email}", style=MaterialTheme.typography.bodyLarge)
+            Text(text="Date: ${data.date}", style=MaterialTheme.typography.bodyLarge)
+            Text(text="Length: ${data.length}", style=MaterialTheme.typography.bodyMedium)
+            Text(text="Pee: ${if (data.pee) "Yes" else "No"}", style=MaterialTheme.typography.bodyMedium)
+            Text(text="Poo: ${if (data.poo) "Yes" else "No"}", style=MaterialTheme.typography.bodyMedium)
+            Text(text="Done: ${if (data.done) "Yes" else "No"}", style=MaterialTheme.typography.bodyMedium)
         }
     }
 }
@@ -282,23 +281,13 @@ fun saveWalkingDataToFirestore(
     if (userEmail != null) {
         val db = FirebaseFirestore.getInstance()
 
-        val walkingData = hashMapOf(
-            "email" to userEmail,
-            "date" to selectedDate.toString(),
-            "done" to false, // Future walks are not marked as done yet
-            "length" to length,
-            "pee" to pee,
-            "poo" to poo
-        )
+        val walkingDataMap =
+            hashMapOf("email" to userEmail, "date" to selectedDate.toString(), "done" to false, "length" to length, "pee" to pee, "poo" to poo)
 
         db.collection("dogWalking")
-            .add(walkingData)
-            .addOnSuccessListener {
-                Toast.makeText(context, "Future walk saved successfully!", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(context, "Failed to save data: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+            .add(walkingDataMap)
+            .addOnSuccessListener { Toast.makeText(context, "Future walk saved successfully!", Toast.LENGTH_SHORT).show() }
+            .addOnFailureListener { e -> Toast.makeText(context, "Failed to save data: ${e.message}", Toast.LENGTH_SHORT).show() }
     } else {
         Toast.makeText(context, "User not authenticated.", Toast.LENGTH_SHORT).show()
     }

@@ -119,8 +119,8 @@ class MainActivity : ComponentActivity() {
             }
     }
 }
-@OptIn(ExperimentalMaterial3Api::class)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     modifier: Modifier = Modifier,
