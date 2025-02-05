@@ -47,9 +47,6 @@ class DogWalkingActivity : ComponentActivity() {
         }
     }
 
-    fun updateWalkingDataList(data: List<DogWalkingData>) {
-        walkingDataListUpdater?.invoke(data)
-    }
 }
 
 
@@ -61,10 +58,8 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
     val calendarDialogState = rememberUseCaseState()
     var walkingDataList by remember { mutableStateOf<List<DogWalkingData>>(emptyList()) }
 
-    // State variables for pee, poo, and length inputs
+    // State variables for length input
     var length by remember { mutableStateOf("") }
-    var pee by remember { mutableStateOf(false) }
-    var poo by remember { mutableStateOf(false) }
 
     // Provide a callback for updating the list
     onUpdateListCallback { updatedList ->
@@ -115,33 +110,15 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
                 selectedDate?.let {
                     Text(text = "Selected Date: $it", style = MaterialTheme.typography.bodyLarge)
 
-                    if (!it.isAfter(LocalDate.now())) {
+                    if (it.isAfter(LocalDate.now())) { // Future walks
                         Spacer(modifier = Modifier.height(16.dp))
 
                         OutlinedTextField(
                             value = length,
                             onValueChange = { length = it },
-                            label = { Text("Length (e.g., 30 mins)") },
+                            label = { Text("Approximate Time (e.g., 13h or 30 mins)") },
                             modifier = Modifier.fillMaxWidth()
                         )
-
-                        Spacer(modifier = Modifier.height(8.dp))
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = pee,
-                                onCheckedChange = { pee = it }
-                            )
-                            Text(text = "Pee")
-                        }
-
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Checkbox(
-                                checked = poo,
-                                onCheckedChange = { poo = it }
-                            )
-                            Text(text = "Poo")
-                        }
                     }
                 }
 
@@ -149,15 +126,17 @@ fun DogWalkingScreen(onUpdateListCallback: ((List<DogWalkingData>) -> Unit) -> U
 
                 Button(
                     onClick = {
-                        if (selectedDate != null) {
-                            saveWalkingDataToFirestore(selectedDate!!, context, length, pee, poo)
-                        } else {
+                        if (selectedDate == null) {
                             Toast.makeText(context, "Please select a date first.", Toast.LENGTH_SHORT).show()
+                        } else if (length.isEmpty()) {
+                            Toast.makeText(context, "Please enter the approximate time or length.", Toast.LENGTH_SHORT).show()
+                        } else {
+                            saveWalkingDataToFirestore(selectedDate!!, context, length, false, false)
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text(text = "Start Walking")
+                    Text(text = "Save Walk")
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -237,9 +216,15 @@ fun FutureWalkRow(data: DogWalkingData) {
                 style = MaterialTheme.typography.bodyLarge,
                 color = Color.Black // Adjust color as needed for your theme.
             )
+            Text(
+                text = "Approximate Time/Length: ${data.length}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.Black
+            )
         }
     }
 }
+
 
 
 @Composable
@@ -283,6 +268,7 @@ fun fetchWalkingDataFromFirestore(onResult: (List<DogWalkingData>) -> Unit) {
         onResult(emptyList())
     }
 }
+
 fun saveWalkingDataToFirestore(
     selectedDate: LocalDate,
     context: android.content.Context,
@@ -296,22 +282,19 @@ fun saveWalkingDataToFirestore(
     if (userEmail != null) {
         val db = FirebaseFirestore.getInstance()
 
-        // Determine if the walk is in the past or today
-        val isPastWalkOrToday = !selectedDate.isAfter(LocalDate.now())
-
         val walkingData = hashMapOf(
             "email" to userEmail,
             "date" to selectedDate.toString(),
-            "done" to isPastWalkOrToday, // Mark as done if it's today or in the past
-            "length" to if (isPastWalkOrToday) length else "",
-            "pee" to if (isPastWalkOrToday) pee else false,
-            "poo" to if (isPastWalkOrToday) poo else false
+            "done" to false, // Future walks are not marked as done yet
+            "length" to length,
+            "pee" to pee,
+            "poo" to poo
         )
 
         db.collection("dogWalking")
             .add(walkingData)
             .addOnSuccessListener {
-                Toast.makeText(context, "Walking data saved successfully!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, "Future walk saved successfully!", Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener { e ->
                 Toast.makeText(context, "Failed to save data: ${e.message}", Toast.LENGTH_SHORT).show()
